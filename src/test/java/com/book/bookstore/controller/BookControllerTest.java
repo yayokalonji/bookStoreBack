@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.CoreMatchers.is;
@@ -64,27 +64,38 @@ class BookControllerTest {
     }
 
     @Test
+    void shouldNotFoundBooksById() throws Exception {
+        final String id = "1";
+        given(bookService.findById(id)).willReturn(null);
+
+        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isNotFound());
+    }
+
+    @Test
     void shouldCreateNewBook() throws Exception {
 
-        BooksDTO booksDTO = new BooksDTO("Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        BooksDTO booksDTO = new BooksDTO("1","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+
+        doNothing().when(bookService).create(booksDTO);
 
         this.mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(booksDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
+
+        verify(bookService).create(booksDTO);
     }
 
     @Test
     void shouldUpdateBooks() throws Exception {
         BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
         given(bookService.findById(booksDTO.getId())).willReturn(booksDTO);
-        given(bookService.update(any(BooksDTO.class))).willAnswer((invocation) -> invocation.getArgument(0));
+        given(bookService.update(booksDTO)).willAnswer((invocation) -> invocation.getArgument(0));
 
         this.mockMvc.perform(put("/api/books/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(booksDTO)))
                 .andExpect(status().isOk());
-
     }
 
     @Test

@@ -16,10 +16,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,14 +39,14 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldFetchAllBooks() {
+    void shouldFetchAllBooks(){
 
         given(bookRepository.findAll()).willReturn(bookList);
 
         Collection<BooksDTO> booksDTOList = bookServiceImpl.getAllBooks();
 
         assertEquals(booksDTOList, bookList);
-        verify(bookRepository, times(1)).findAll();
+        verify(bookRepository).findAll();
     }
 
     @Test
@@ -59,7 +58,7 @@ class BookServiceTest {
 
         bookServiceImpl.create(booksDTO);
 
-        verify(bookRepository, times(1)).insert(booksDTO);
+        verify(bookRepository).insert(booksDTO);
     }
 
     @Test
@@ -72,30 +71,32 @@ class BookServiceTest {
 
         assertThat(booksDTOS).isNotNull();
 
-        verify(bookRepository, times(1)).findById(id);
+        verify(bookRepository).findById(id);
     }
 
 
     @Test
-    void shouldUpdateBooks() {
+    void shouldUpdateBooks(){
 
         BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
 
-        given(bookRepository.save(any(BooksDTO.class))).willAnswer((invocation) -> invocation.getArgument(0));
+        given(bookRepository.save(booksDTO)).willAnswer((invocation) -> invocation.getArgument(0));
 
         final BooksDTO booksDTOS = bookServiceImpl.update(booksDTO);
 
-        assertThat(booksDTOS).isNotNull();
+        assertThat(booksDTOS).isSameAs(booksDTO);
 
-        verify(bookRepository).save(any(BooksDTO.class));
+        verify(bookRepository).save(booksDTOS);
     }
 
     @Test
-    void shouldDeleteBooks() {
+    void shouldDeleteBooks(){
         final String id = "60a41ec3b71c4bc75aab9022";
+
+        doNothing().when(bookRepository).deleteById(id);
 
         bookServiceImpl.delete(id);
 
-        verify(bookRepository, times(1)).deleteById(id);
+        verify(bookRepository).deleteById(id);
     }
 }

@@ -22,12 +22,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void create(BooksDTO booksDTO) {
+    public void create(BooksDTO booksDTO){
         bookRepository.insert(booksDTO);
     }
 
     @Override
-    public BooksDTO update(BooksDTO booksDTO) {
+    public BooksDTO update(BooksDTO booksDTO){
         return bookRepository.save(booksDTO);
     }
 
@@ -49,7 +49,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BooksDTO findById(String id) {
-        return bookRepository.findById(id).orElse(new BooksDTO());
+    public BooksDTO findById(String id){
+        return bookRepository.findById(id).orElse(null);
     }
 }
