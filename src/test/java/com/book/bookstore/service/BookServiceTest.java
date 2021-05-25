@@ -92,8 +92,8 @@ class BookServiceTest {
 
         given(bookRepository.findById(id)).willReturn(Optional.of(booksDTO));
 
-        bookServiceImpl.deleteBooks(id);
+        BooksDTO booksDTOS = bookServiceImpl.deleteBooks(id);
 
-        verify(bookRepository, times(1)).deleteById(id);
+        assertThat(booksDTOS).isSameAs(booksDTO);
     }
 }

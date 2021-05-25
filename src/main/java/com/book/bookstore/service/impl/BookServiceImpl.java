@@ -31,12 +31,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BooksDTO deleteBooks(String id) {
-        BooksDTO booksDTO = bookRepository.findById(id).orElse(null);
-
-       if (booksDTO != null){
-           bookRepository.deleteById(id);
-       }
-       return booksDTO;
+       return  bookRepository.findById(id).orElse(null);
     }
 
     @Override

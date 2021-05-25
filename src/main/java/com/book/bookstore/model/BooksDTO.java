@@ -1,13 +1,10 @@
 package com.book.bookstore.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class BooksDTO {
 
     @Id

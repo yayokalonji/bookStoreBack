@@ -47,7 +47,7 @@ class BookControllerTest {
     }
 
     @Test
-    void shouldFetchAllBooks() throws Exception {
+    void getAllBooks() throws Exception {
 
         given(bookService.getAllBooks()).willReturn(bookList);
 
@@ -76,16 +76,16 @@ class BookControllerTest {
     @Test
     void shouldCreateNewBook() throws Exception {
 
-        this.booksDTO = new BooksDTO("1","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        final BooksDTO booksDTO1 = new BooksDTO("1","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
 
-        doNothing().when(bookService).saveBooks(this.booksDTO);
+        // doNothing().when(bookService).saveBooks(booksDTO1);
 
         this.mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(this.booksDTO)))
+                .content(objectMapper.writeValueAsString(booksDTO1)))
                 .andExpect(status().isCreated());
 
-        verify(bookService).saveBooks(this.booksDTO);
+        verify(bookService).saveBooks(booksDTO1);
     }
 
     @Test
