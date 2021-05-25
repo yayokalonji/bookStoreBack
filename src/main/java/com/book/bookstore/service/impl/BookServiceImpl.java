@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -22,34 +20,27 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void create(BooksDTO booksDTO){
+    public void saveBooks(BooksDTO booksDTO){
         bookRepository.insert(booksDTO);
     }
 
     @Override
-    public BooksDTO update(BooksDTO booksDTO){
+    public BooksDTO updateBooks(BooksDTO booksDTO){
         return bookRepository.save(booksDTO);
     }
 
     @Override
-    public Map<String, String> delete(String id) {
+    public BooksDTO deleteBooks(String id) {
+        BooksDTO booksDTO = bookRepository.findById(id).orElse(null);
 
-        long beforeDelete = bookRepository.count();
-
-        bookRepository.deleteById(id);
-
-        long afterDelete = bookRepository.count();
-
-        String messageValue  = beforeDelete == afterDelete ? "Something went wrong!" : "Record deleted";
-
-        Map<String, String> deleteMap = new HashMap<>();
-        deleteMap.put("message", messageValue);
-
-        return deleteMap;
+       if (booksDTO != null){
+           bookRepository.deleteById(id);
+       }
+       return booksDTO;
     }
 
     @Override
-    public BooksDTO findById(String id){
+    public BooksDTO getBooksById(String id){
         return bookRepository.findById(id).orElse(null);
     }
 }

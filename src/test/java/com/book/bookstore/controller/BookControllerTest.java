@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -35,13 +36,14 @@ class BookControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
     private List<BooksDTO> bookList;
+    private BooksDTO booksDTO;
 
     @BeforeEach
     void setUp(){
         this.bookList = new ArrayList<>();
-        this.bookList.add(new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan"));
+        this.booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.bookList.add(this.booksDTO);
     }
 
     @Test
@@ -57,8 +59,8 @@ class BookControllerTest {
     @Test
     void shouldFetchOneBooksById() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
-        final BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        given(bookService.findById(id)).willReturn(booksDTO);
+        this.booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        given(bookService.getBooksById(id)).willReturn(booksDTO);
 
         this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
     }
@@ -66,35 +68,35 @@ class BookControllerTest {
     @Test
     void shouldNotFoundBooksById() throws Exception {
         final String id = "1";
-        given(bookService.findById(id)).willReturn(null);
+        given(bookService.getBooksById(id)).willReturn(null);
 
-        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
     }
 
     @Test
     void shouldCreateNewBook() throws Exception {
 
-        BooksDTO booksDTO = new BooksDTO("1","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.booksDTO = new BooksDTO("1","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
 
-        doNothing().when(bookService).create(booksDTO);
+        doNothing().when(bookService).saveBooks(this.booksDTO);
 
         this.mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(booksDTO)))
+                .content(objectMapper.writeValueAsString(this.booksDTO)))
                 .andExpect(status().isCreated());
 
-        verify(bookService).create(booksDTO);
+        verify(bookService).saveBooks(this.booksDTO);
     }
 
     @Test
     void shouldUpdateBooks() throws Exception {
-        BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        given(bookService.findById(booksDTO.getId())).willReturn(booksDTO);
-        given(bookService.update(booksDTO)).willAnswer((invocation) -> invocation.getArgument(0));
+        this.booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        given(bookService.getBooksById(this.booksDTO.getId())).willReturn(this.booksDTO);
+        given(bookService.updateBooks(this.booksDTO)).willAnswer((invocation) -> invocation.getArgument(0));
 
         this.mockMvc.perform(put("/api/books/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(booksDTO)))
+                .content(objectMapper.writeValueAsString(this.booksDTO)))
                 .andExpect(status().isOk());
     }
 
@@ -102,6 +104,16 @@ class BookControllerTest {
     void shouldDeleteBooks() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
         this.mockMvc.perform(delete("/api/books/{id}", id))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldFetchAllNotFoundBooks() throws Exception {
+
+        Collection<BooksDTO> booksDTOS = new ArrayList<>();
+        given(bookService.getAllBooks()).willReturn(booksDTOS);
+
+        this.mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk());
     }
 }

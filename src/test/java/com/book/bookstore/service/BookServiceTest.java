@@ -9,17 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
@@ -27,15 +24,17 @@ class BookServiceTest {
     @Mock
     private BookRepository bookRepository;
 
+    @Autowired
     @InjectMocks
     private BookServiceImpl bookServiceImpl;
-
     private List<BooksDTO> bookList;
+    private BooksDTO booksDTO;
 
     @BeforeEach
     void setUp(){
         this.bookList = new ArrayList<>();
-        this.bookList.add(new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan"));
+        this.booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.bookList.add(booksDTO);
     }
 
     @Test
@@ -46,57 +45,55 @@ class BookServiceTest {
         Collection<BooksDTO> booksDTOList = bookServiceImpl.getAllBooks();
 
         assertEquals(booksDTOList, bookList);
-        verify(bookRepository).findAll();
+        verify(bookRepository, times(1)).findAll();
     }
 
     @Test
     void shouldSavedBookSuccessFully(){
 
-        final BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-
         given(bookRepository.insert(booksDTO)).willReturn(booksDTO);
 
-        bookServiceImpl.create(booksDTO);
+        bookServiceImpl.saveBooks(booksDTO);
 
-        verify(bookRepository).insert(booksDTO);
+        verify(bookRepository, times(1)).insert(booksDTO);
     }
 
     @Test
     void shouldFetchIdBooks(){
         final String id = "60a41ec3b71c4bc75aab9022";
-        final BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
         given(bookRepository.findById(id)).willReturn(Optional.of(booksDTO));
 
-        final BooksDTO booksDTOS = bookServiceImpl.findById(id);
+        final BooksDTO booksDTOS = bookServiceImpl.getBooksById(id);
 
-        assertThat(booksDTOS).isNotNull();
+        assertThat(booksDTOS).isSameAs(booksDTO);
 
-        verify(bookRepository).findById(id);
+        verify(bookRepository, times(1)).findById(id);
     }
 
 
     @Test
     void shouldUpdateBooks(){
 
-        BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022","Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-
         given(bookRepository.save(booksDTO)).willAnswer((invocation) -> invocation.getArgument(0));
 
-        final BooksDTO booksDTOS = bookServiceImpl.update(booksDTO);
+        final BooksDTO booksDTOS = bookServiceImpl.updateBooks(booksDTO);
 
         assertThat(booksDTOS).isSameAs(booksDTO);
 
-        verify(bookRepository).save(booksDTOS);
+        verify(bookRepository, times(1)).save(booksDTOS);
     }
+
+
 
     @Test
     void shouldDeleteBooks(){
+
         final String id = "60a41ec3b71c4bc75aab9022";
 
-        doNothing().when(bookRepository).deleteById(id);
+        given(bookRepository.findById(id)).willReturn(Optional.of(booksDTO));
 
-        bookServiceImpl.delete(id);
+        bookServiceImpl.deleteBooks(id);
 
-        verify(bookRepository).deleteById(id);
+        verify(bookRepository, times(1)).deleteById(id);
     }
 }

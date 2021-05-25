@@ -17,10 +17,4 @@ public class BooksDTO {
     private String category;
     private String author;
 
-    public BooksDTO(String name, double price, String category, String author){
-        this.name = name;
-        this.price = price;
-        this.category = category;
-        this.author = author;
-    }
 }
