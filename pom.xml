@@ -22,7 +22,7 @@
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.language>java</sonar.language>
-		<sonar.projectKey>yayokalonji_bookStoreBack</sonar.projectKey>
+		<sonar.projectKey>bookStoreBack</sonar.projectKey>
 		<sonar.organization>bookstoreback</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
