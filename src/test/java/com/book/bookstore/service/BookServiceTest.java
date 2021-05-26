@@ -70,7 +70,6 @@ class BookServiceTest {
         verify(bookRepository, times(1)).findById(id);
     }
 
-
     @Test
     void shouldUpdateBooks(){
 
@@ -82,8 +81,6 @@ class BookServiceTest {
 
         verify(bookRepository, times(1)).save(booksDTOS);
     }
-
-
 
     @Test
     void shouldDeleteBooks(){
