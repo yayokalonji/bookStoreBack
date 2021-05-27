@@ -1,6 +1,7 @@
 package com.book.bookstore.service;
 
-import com.book.bookstore.model.BooksDTO;
+import com.book.bookstore.model.Books;
+import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
 import com.book.bookstore.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,12 +12,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
@@ -27,14 +32,16 @@ class BookServiceTest {
     @Autowired
     @InjectMocks
     private BookServiceImpl bookServiceImpl;
-    private List<BooksDTO> bookList;
-    private BooksDTO booksDTO;
+    private List<Books> bookList;
+    private Books books;
+    private BooksRequest booksRequest;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         this.bookList = new ArrayList<>();
-        this.booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        this.bookList.add(booksDTO);
+        this.books = new Books("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.bookList.add(books);
     }
 
     @Test
@@ -42,30 +49,30 @@ class BookServiceTest {
 
         given(bookRepository.findAll()).willReturn(bookList);
 
-        Collection<BooksDTO> booksDTOList = bookServiceImpl.getAllBooks();
+        Collection<Books> booksList = bookServiceImpl.getAllBooks();
 
-        assertEquals(booksDTOList, bookList);
+        assertEquals(booksList, bookList);
         verify(bookRepository, times(1)).findAll();
     }
 
     @Test
     void shouldSavedBookSuccessFully(){
 
-        given(bookRepository.insert(booksDTO)).willReturn(booksDTO);
+        given(bookRepository.insert(books)).willReturn(books);
 
-        bookServiceImpl.saveBooks(booksDTO);
+        bookServiceImpl.saveBooks(booksRequest);
 
-        verify(bookRepository, times(1)).insert(booksDTO);
+        verify(bookRepository, times(1)).insert(books);
     }
 
     @Test
     void shouldFetchIdBooks(){
         final String id = "60a41ec3b71c4bc75aab9022";
-        given(bookRepository.findById(id)).willReturn(Optional.of(booksDTO));
+        given(bookRepository.findById(id)).willReturn(Optional.of(books));
 
-        final BooksDTO booksDTOS = bookServiceImpl.getBooksById(id);
+        final Books booksDTOS = bookServiceImpl.getBooksById(id);
 
-        assertThat(booksDTOS).isSameAs(booksDTO);
+        assertThat(booksDTOS).isSameAs(books);
 
         verify(bookRepository, times(1)).findById(id);
     }
@@ -73,11 +80,11 @@ class BookServiceTest {
     @Test
     void shouldUpdateBooks(){
 
-        given(bookRepository.save(booksDTO)).willAnswer((invocation) -> invocation.getArgument(0));
+        given(bookRepository.save(this.books)).willAnswer((invocation) -> invocation.getArgument(0));
 
-        final BooksDTO booksDTOS = bookServiceImpl.updateBooks(booksDTO);
+        final Books booksDTOS = bookServiceImpl.updateBooks(booksRequest);
 
-        assertThat(booksDTOS).isSameAs(booksDTO);
+        assertThat(booksDTOS).isEqualTo(this.books);
 
         verify(bookRepository, times(1)).save(booksDTOS);
     }
@@ -87,10 +94,10 @@ class BookServiceTest {
 
         final String id = "60a41ec3b71c4bc75aab9022";
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(booksDTO));
+        given(bookRepository.findById(id)).willReturn(Optional.of(books));
 
-        BooksDTO booksDTOS = bookServiceImpl.deleteBooks(id);
+        Books booksDTOS = bookServiceImpl.deleteBooks(id);
 
-        assertThat(booksDTOS).isSameAs(booksDTO);
+        assertThat(booksDTOS).isSameAs(books);
     }
 }

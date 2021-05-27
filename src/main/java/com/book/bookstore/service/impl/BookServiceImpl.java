@@ -1,6 +1,7 @@
 package com.book.bookstore.service.impl;
 
-import com.book.bookstore.model.BooksDTO;
+import com.book.bookstore.model.Books;
+import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
 import com.book.bookstore.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,27 +16,29 @@ public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
 
     @Override
-    public Collection<BooksDTO> getAllBooks() {
+    public Collection<Books> getAllBooks() {
         return bookRepository.findAll();
     }
 
     @Override
-    public void saveBooks(BooksDTO booksDTO){
-        bookRepository.insert(booksDTO);
+    public void saveBooks(BooksRequest booksRequest) {
+        Books books = new Books(booksRequest.getId(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory(), booksRequest.getAuthor());
+        bookRepository.insert(books);
     }
 
     @Override
-    public BooksDTO updateBooks(BooksDTO booksDTO){
-        return bookRepository.save(booksDTO);
+    public Books updateBooks(BooksRequest booksRequest) {
+        Books books = new Books(booksRequest.getId(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory(), booksRequest.getAuthor());
+        return bookRepository.save(books);
     }
 
     @Override
-    public BooksDTO deleteBooks(String id) {
-       return  bookRepository.findById(id).orElse(null);
+    public Books deleteBooks(String id) {
+        return bookRepository.findById(id).orElse(null);
     }
 
     @Override
-    public BooksDTO getBooksById(String id){
+    public Books getBooksById(String id) {
         return bookRepository.findById(id).orElse(null);
     }
 }

@@ -1,6 +1,7 @@
 package com.book.bookstore.service;
 
-import com.book.bookstore.model.BooksDTO;
+import com.book.bookstore.model.Books;
+import com.book.bookstore.model.BooksRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -8,13 +9,13 @@ import java.util.Collection;
 @Service
 public interface BookService {
 
-    Collection<BooksDTO> getAllBooks();
+    Collection<Books> getAllBooks();
 
-    void saveBooks(BooksDTO booksDTO);
+    void saveBooks(BooksRequest booksRequest);
 
-    BooksDTO updateBooks(BooksDTO booksDTO);
+    Books updateBooks(BooksRequest booksRequest);
 
-    BooksDTO deleteBooks (String id);
+    Books deleteBooks(String id);
 
-    BooksDTO getBooksById(String id);
+    Books getBooksById(String id);
 }

@@ -1,16 +1,19 @@
 package com.book.bookstore.model;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class BooksDTO {
+public class BooksRequest {
 
-    @Id
     private String id;
+
     private String name;
+
     private double price;
+
     private String category;
+
     private String author;
 }
