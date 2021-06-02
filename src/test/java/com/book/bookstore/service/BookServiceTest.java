@@ -3,7 +3,7 @@ package com.book.bookstore.service;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
-import com.book.bookstore.service.impl.BookServiceImpl;
+import com.book.bookstore.service.impl.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,20 @@ class BookServiceTest {
 
     @Autowired
     @InjectMocks
-    private BookServiceImpl bookServiceImpl;
+    private BookSaveServiceImpl bookServiceImpl;
+    @Autowired
+    @InjectMocks
+    private BookGetAllServiceImpl bookGetAllServiceImpl;
+    @Autowired
+    @InjectMocks
+    private BookUpdateServiceImpl updateAllServiceImpl;
+    @Autowired
+    @InjectMocks
+    private BookDeleteServiceImpl deleteAllServiceImpl;
+    @Autowired
+    @InjectMocks
+    private BookGetIdServiceImpl queryIdServiceImpl;
+
     private List<Books> bookList;
     private Books books;
     private BooksRequest booksRequest;
@@ -49,7 +62,7 @@ class BookServiceTest {
 
         given(bookRepository.findAll()).willReturn(bookList);
 
-        Collection<Books> booksList = bookServiceImpl.getAllBooks();
+        Collection<Books> booksList = bookGetAllServiceImpl.getAllBooks();
 
         assertEquals(booksList, bookList);
         verify(bookRepository, times(1)).findAll();
@@ -70,7 +83,7 @@ class BookServiceTest {
         final String id = "60a41ec3b71c4bc75aab9022";
         given(bookRepository.findById(id)).willReturn(Optional.of(books));
 
-        final Books booksDTOS = bookServiceImpl.getBooksById(id);
+        final Books booksDTOS = queryIdServiceImpl.getBooksById(id);
 
         assertThat(booksDTOS).isSameAs(books);
 
@@ -82,7 +95,7 @@ class BookServiceTest {
 
         given(bookRepository.save(this.books)).willAnswer((invocation) -> invocation.getArgument(0));
 
-        final Books booksDTOS = bookServiceImpl.updateBooks(booksRequest);
+        final Books booksDTOS = updateAllServiceImpl.updateBooks(booksRequest);
 
         assertThat(booksDTOS).isEqualTo(this.books);
 
@@ -96,7 +109,7 @@ class BookServiceTest {
 
         given(bookRepository.findById(id)).willReturn(Optional.of(books));
 
-        Books booksDTOS = bookServiceImpl.deleteBooks(id);
+        Books booksDTOS = deleteAllServiceImpl.deleteBooks(id);
 
         assertThat(booksDTOS).isSameAs(books);
     }
