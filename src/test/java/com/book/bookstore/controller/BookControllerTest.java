@@ -2,7 +2,7 @@ package com.book.bookstore.controller;
 
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
-import com.book.bookstore.service.*;
+import com.book.bookstore.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,15 +33,7 @@ class BookControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private BookSaveService bookSaveService;
-    @MockBean
-    private BookGetAllService bookGetAllService;
-    @MockBean
-    private BookUpdateService bookUpdateService;
-    @MockBean
-    private BookDeleteService bookDeleteService;
-    @MockBean
-    private BookGetIdService bookGetIdService;
+    private BookService bookService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -60,7 +52,7 @@ class BookControllerTest {
     @Test
     void getAllBooks() throws Exception {
 
-        given(bookGetAllService.getAllBooks()).willReturn(bookList);
+        given(bookService.getAllBooks()).willReturn(bookList);
 
         this.mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
@@ -71,7 +63,7 @@ class BookControllerTest {
     void shouldFetchOneBooksById() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
         this.books = new Books("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        given(bookGetIdService.getBooksById(id)).willReturn(books);
+        given(bookService.getBooksById(id)).willReturn(books);
 
         this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
     }
@@ -79,7 +71,7 @@ class BookControllerTest {
     @Test
     void shouldNotFoundBooksById() throws Exception {
         final String id = "1";
-        given(bookGetIdService.getBooksById(id)).willReturn(null);
+        given(bookService.getBooksById(id)).willReturn(null);
 
         this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
     }
@@ -92,13 +84,13 @@ class BookControllerTest {
                 .content(objectMapper.writeValueAsString(this.booksRequest)))
                 .andExpect(status().isCreated());
 
-        doNothing().when(bookSaveService).saveBooks(this.booksRequest);
+        doNothing().when(bookService).saveBooks(this.booksRequest);
     }
 
     @Test
     void shouldUpdateBooks() throws Exception {
         BooksRequest booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        given(bookUpdateService.updateBooks(booksRequest)).willReturn(this.books);
+        given(bookService.updateBooks(booksRequest)).willReturn(this.books);
 
         this.mockMvc.perform(put("/api/books/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -109,7 +101,7 @@ class BookControllerTest {
     @Test
     void shouldDeleteBooks() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
-        given(bookDeleteService.deleteBooks(id)).willReturn(this.books);
+        given(bookService.deleteBooks(id)).willReturn(this.books);
 
         this.mockMvc.perform(delete("/api/books/{id}", id))
                 .andExpect(status().isOk());
@@ -119,7 +111,7 @@ class BookControllerTest {
     void shouldFetchAllNotFoundBooks() throws Exception {
 
         Collection<Books> books = new ArrayList<>();
-        given(bookGetAllService.getAllBooks()).willReturn(books);
+        given(bookService.getAllBooks()).willReturn(books);
 
         this.mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk());
