@@ -16,22 +16,47 @@
 	<packaging>war</packaging>
 	<properties>
 		<java.version>1.8</java.version>
-		<sonar.exclusions>
-			**/BookstoreApplication.java,
-			**/config/*.java,
-			**/model/*.java
-		</sonar.exclusions>
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.language>java</sonar.language>
-		<sonar.projectKey>bookStoreBack</sonar.projectKey>
-		<sonar.organization>bookstoreback</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<deploy.jboss.host>127.0.0.1</deploy.jboss.host>
 		<deploy.jboss.port>9990</deploy.jboss.port>
 		<deploy.jboss.username>wildfly</deploy.jboss.username>
 		<deploy.jboss.password>wildfly</deploy.jboss.password>
 	</properties>
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<properties>
+				<sonar.sources>.</sonar.sources>
+				<sonar.inclusions>src/main/java/**,src/main/resources/**</sonar.inclusions>
+				<sonar.exclusions>**/BookstoreApplication.java,
+					**/config/*.java,
+					**/model/*.java
+				</sonar.exclusions>
+				<sonar.projectKey>yayokalonji_bookStoreBack</sonar.projectKey>
+				<sonar.organization>bookstoreback</sonar.organization>
+				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+			</properties>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonarsource.scanner.maven</groupId>
+						<artifactId>sonar-maven-plugin</artifactId>
+						<version>3.9.0.2155</version>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>sonar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
