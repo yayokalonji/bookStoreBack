@@ -41,7 +41,7 @@ class BookServiceTest {
     @BeforeEach
     void setUp() {
         this.bookList = new ArrayList<>();
-        this.books = new Books("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Political");
         this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
         this.bookList.add(books);
     }

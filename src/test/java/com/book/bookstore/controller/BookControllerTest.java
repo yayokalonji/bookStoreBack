@@ -48,7 +48,7 @@ class BookControllerTest {
     @BeforeEach
     void setUp() {
         this.bookList = new ArrayList<>();
-        this.books = new Books("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
         this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
         this.bookList.add(this.books);
     }
@@ -66,7 +66,7 @@ class BookControllerTest {
     @Test
     void shouldFetchOneBooksById() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
-        this.books = new Books("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
         given(bookService.getBooksById(id)).willReturn(books);
 
         this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());

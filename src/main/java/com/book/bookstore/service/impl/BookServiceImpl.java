@@ -28,7 +28,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void saveBooks(BooksRequest booksRequest) {
-        Books books = new Books(booksRequest.getId(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory(), booksRequest.getAuthor());
+        Books books = new Books(booksRequest.getId(), booksRequest.getAuthor(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory());
         bookRepository.insert(books);
     }
 
@@ -44,7 +44,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Books updateBooks(BooksRequest booksRequest) {
-        Books books = new Books(booksRequest.getId(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory(), booksRequest.getAuthor());
+        Books books = new Books(booksRequest.getId(), booksRequest.getAuthor(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory());
         return bookRepository.save(books);
     }
 
@@ -56,8 +56,8 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<Books> getBooks(Pageable pageable) {
         int toSkip = pageable.getPageSize() * pageable.getPageNumber();
-        List<Books> result = booksMap.values().stream().skip(toSkip).limit(pageable.getPageSize()).collect(toList());
+        List<Books> result = this.booksMap.values().stream().skip(toSkip).limit(pageable.getPageSize()).collect(toList());
 
-        return new PageImpl<>(result, pageable, booksMap.size());
+        return new PageImpl<>(result, pageable, this.booksMap.size());
     }
 }
