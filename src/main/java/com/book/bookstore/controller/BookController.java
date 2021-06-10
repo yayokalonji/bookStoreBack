@@ -89,6 +89,16 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBooksById(id));
     }
 
+    @Operation(summary = "Get a book by filter")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the book",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Books.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Book not found",
+                    content = @Content)
+    })
     @GetMapping("/filter")
     public Page<Books> filterBooks(Pageable pageable) {
         return bookService.getBooks(pageable);
