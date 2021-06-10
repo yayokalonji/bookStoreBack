@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,7 +92,7 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldDeleteBooks(){
+    void shouldDeleteBooks() {
 
         final String id = "60a41ec3b71c4bc75aab9022";
 
@@ -99,5 +101,14 @@ class BookServiceTest {
         Books booksDTOS = bookServiceImpl.deleteBooks(id);
 
         assertThat(booksDTOS).isSameAs(books);
+    }
+
+    @Test
+    void shouldFetchFilter() {
+        PageRequest pagingRequest = PageRequest.of(1, 10);
+
+        Page<Books> booksDTOS = bookServiceImpl.getBooks(pagingRequest);
+
+        assertThat(booksDTOS).doesNotContainNull();
     }
 }

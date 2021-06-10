@@ -6,9 +6,13 @@ import com.book.bookstore.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -114,6 +118,18 @@ class BookControllerTest {
         given(bookService.getAllBooks()).willReturn(books);
 
         this.mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldFetchFilter() throws Exception {
+
+        PageRequest pagingRequest = PageRequest.of(1, 10);
+        Page<Books> booksPage = new PageImpl<>(this.bookList, pagingRequest, this.bookList.size());
+
+        given(bookService.getBooks(Mockito.any(PageRequest.class))).willReturn(booksPage);
+
+        this.mockMvc.perform(get("/api/books/filter?page=1&size=10"))
                 .andExpect(status().isOk());
     }
 }

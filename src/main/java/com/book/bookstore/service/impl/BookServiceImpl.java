@@ -5,9 +5,17 @@ import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
 import com.book.bookstore.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -15,6 +23,8 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    private final Map<Long, Books> booksMap = new HashMap<>();
 
     @Override
     public void saveBooks(BooksRequest booksRequest) {
@@ -41,5 +51,13 @@ public class BookServiceImpl implements BookService {
     @Override
     public Books deleteBooks(String id) {
         return bookRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Page<Books> getBooks(Pageable pageable) {
+        int toSkip = pageable.getPageSize() * pageable.getPageNumber();
+        List<Books> result = booksMap.values().stream().skip(toSkip).limit(pageable.getPageSize()).collect(toList());
+
+        return new PageImpl<>(result, pageable, booksMap.size());
     }
 }
