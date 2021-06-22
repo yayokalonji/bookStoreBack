@@ -50,7 +50,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Books deleteBooks(String id) {
-        return bookRepository.findById(id).orElse(null);
+        Books books = bookRepository.findById(id).orElse(null);
+        if (books != null) {
+            bookRepository.delete(books);
+        }
+        return books;
     }
 
     @Override
