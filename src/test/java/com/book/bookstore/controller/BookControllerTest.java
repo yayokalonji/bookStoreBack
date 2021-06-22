@@ -23,7 +23,6 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,7 +87,7 @@ class BookControllerTest {
                 .content(objectMapper.writeValueAsString(this.booksRequest)))
                 .andExpect(status().isCreated());
 
-        doNothing().when(bookService).saveBooks(this.booksRequest);
+        given(bookService.saveBooks(this.booksRequest)).willReturn(this.books);
     }
 
     @Test

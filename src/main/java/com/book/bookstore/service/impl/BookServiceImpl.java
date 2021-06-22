@@ -27,9 +27,9 @@ public class BookServiceImpl implements BookService {
     private final Map<Long, Books> booksMap = new HashMap<>();
 
     @Override
-    public void saveBooks(BooksRequest booksRequest) {
-        Books books = new Books(booksRequest.getId(), booksRequest.getAuthor(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory());
-        bookRepository.insert(books);
+    public Books saveBooks(BooksRequest booksRequest) {
+        Books books = new Books(booksRequest.getAuthor(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory());
+        return bookRepository.insert(books);
     }
 
     @Override

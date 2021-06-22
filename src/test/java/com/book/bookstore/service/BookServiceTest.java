@@ -35,13 +35,14 @@ class BookServiceTest {
     @InjectMocks
     private BookServiceImpl bookServiceImpl;
     private List<Books> bookList;
-    private Books books;
+    private Books books, booksInsert;
     private BooksRequest booksRequest;
 
     @BeforeEach
     void setUp() {
         this.bookList = new ArrayList<>();
         this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Political");
+        this.booksInsert = new Books("Jason Brennan", "Against Democracy: New Preface", 18.95, "Political");
         this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
         this.bookList.add(books);
     }
@@ -60,11 +61,11 @@ class BookServiceTest {
     @Test
     void shouldSavedBookSuccessFully(){
 
-        given(bookRepository.insert(books)).willReturn(books);
+        given(bookRepository.insert(booksInsert)).willReturn(books);
 
         bookServiceImpl.saveBooks(booksRequest);
 
-        verify(bookRepository, times(1)).insert(books);
+        verify(bookRepository, times(1)).insert(booksInsert);
     }
 
     @Test

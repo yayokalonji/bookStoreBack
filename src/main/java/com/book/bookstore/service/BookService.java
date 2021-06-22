@@ -11,7 +11,7 @@ import java.util.Collection;
 @Service
 public interface BookService {
 
-    void saveBooks(BooksRequest booksRequest);
+    Books saveBooks(BooksRequest booksRequest);
 
     Collection<Books> getAllBooks();
 

@@ -47,9 +47,8 @@ public class BookController {
                             schema = @Schema(implementation = String.class))})
     })
     @PostMapping
-    public ResponseEntity<String> saveBooks(@RequestBody BooksRequest booksRequest) {
-        bookService.saveBooks(booksRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Ok");
+    public ResponseEntity<Books> saveBooks(@RequestBody BooksRequest booksRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.saveBooks(booksRequest));
     }
 
     @Operation(summary = "Update a books")
