@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @OpenAPIDefinition(info = @Info(title = "Books API", version = "1.0", description = "Bookstore Information"))
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.book.bookstore")
 public class BookstoreApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

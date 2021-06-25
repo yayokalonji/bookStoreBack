@@ -24,8 +24,6 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @Autowired
-
     @Operation(summary = "Get all books")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found all books",

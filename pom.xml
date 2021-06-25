@@ -153,9 +153,9 @@
 						<configuration>
 							<rules>
 								<rule>
-									<element>CLASS</element>
 									<excludes>
 										<exclude>com.book.bookstore.BookstoreApplication</exclude>
+										<exclude>com/book/bookstore/model/</exclude>
 									</excludes>
 									<limits>
 										<limit>
