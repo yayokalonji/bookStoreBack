@@ -1,5 +1,6 @@
 package com.book.bookstore.controller;
 
+import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.service.BookService;
@@ -8,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,8 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+    Logger logger = LoggerFactory.getLogger(BookController.class);
+
     @Operation(summary = "Get all books")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found all books",
@@ -34,6 +39,7 @@ public class BookController {
     public ResponseEntity<Collection<Books>> getAllBooks() {
 
         Collection<Books> books = bookService.getAllBooks();
+        logger.info("All books: {} ", books);
 
         return ResponseEntity.ok(books);
     }
@@ -45,8 +51,12 @@ public class BookController {
                             schema = @Schema(implementation = String.class))})
     })
     @PostMapping
-    public ResponseEntity<Books> saveBooks(@RequestBody BooksRequest booksRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.saveBooks(booksRequest));
+    public ResponseEntity<Books> saveBooks(@RequestBody BooksRequest booksRequest) throws ApiException {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(bookService.saveBooks(booksRequest));
+        } catch (Exception e) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Operation(summary = "Update a books")

@@ -2,6 +2,7 @@ package com.book.bookstore.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 
@@ -17,6 +18,7 @@ public class BooksRequest {
     private double price;
     @NotBlank
     private String category;
+    @NonNull
     @NotBlank
     private String author;
 }

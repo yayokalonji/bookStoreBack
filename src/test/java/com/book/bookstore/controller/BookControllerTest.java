@@ -17,9 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -130,5 +128,26 @@ class BookControllerTest {
 
         this.mockMvc.perform(get("/api/books/filter?page=1&size=10"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testPostBookThirdPartyMissingField() throws Exception {
+        Map<String, String> map = getValidBook();
+        map.remove("author");
+
+        this.mockMvc.perform(post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(map)))
+                .andExpect(status().is4xxClientError());
+    }
+
+    private Map<String, String> getValidBook() {
+        Map<String, String> book = new HashMap<>();
+        book.put("id", "1");
+        book.put("name", "100 Side Hustles: Unexpected Ideas for Making Extra Money Without Quitting Your Day Job");
+        book.put("price", "10");
+        book.put("category", "Business");
+        book.put("author", "Chris Guillebeau");
+        return book;
     }
 }
