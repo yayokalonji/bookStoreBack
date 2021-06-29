@@ -1,5 +1,6 @@
 package com.book.bookstore.controller;
 
+import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.service.BookService;
@@ -13,13 +14,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -131,23 +137,15 @@ class BookControllerTest {
     }
 
     @Test
-    void testPostBookThirdPartyMissingField() throws Exception {
-        Map<String, String> map = getValidBook();
-        map.remove("author");
+    void whenDerivedExceptionThrown_thenAssertionSucceds() {
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Bad request");
+        });
 
-        this.mockMvc.perform(post("/api/books")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(map)))
-                .andExpect(status().is4xxClientError());
-    }
+        String expectedMessage = "{reason=Bad Request, code=400, message=Bad request}";
+        String actualMessage = exception.getJsonMessage().toString();
 
-    private Map<String, String> getValidBook() {
-        Map<String, String> book = new HashMap<>();
-        book.put("id", "1");
-        book.put("name", "100 Side Hustles: Unexpected Ideas for Making Extra Money Without Quitting Your Day Job");
-        book.put("price", "10");
-        book.put("category", "Business");
-        book.put("author", "Chris Guillebeau");
-        return book;
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }
+

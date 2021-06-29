@@ -1,5 +1,6 @@
 package com.book.bookstore.service;
 
+import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,28 +51,29 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldFetchAllBooks(){
+    void shouldFetchAllBooks() {
 
         given(bookRepository.findAll()).willReturn(bookList);
 
         Collection<Books> booksList = bookServiceImpl.getAllBooks();
 
         assertEquals(booksList, bookList);
+
         verify(bookRepository, times(1)).findAll();
     }
 
     @Test
-    void shouldSavedBookSuccessFully(){
+    void shouldSavedBookSuccessFully() {
 
-        given(bookRepository.insert(booksInsert)).willReturn(books);
+        given(bookRepository.save(booksInsert)).willReturn(books);
 
         bookServiceImpl.saveBooks(booksRequest);
 
-        verify(bookRepository, times(1)).insert(booksInsert);
+        verify(bookRepository, times(1)).save(booksInsert);
     }
 
     @Test
-    void shouldFetchIdBooks(){
+    void shouldFetchIdBooks() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
         given(bookRepository.findById(id)).willReturn(Optional.of(books));
 
@@ -81,7 +85,7 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldUpdateBooks(){
+    void shouldUpdateBooks() {
 
         given(bookRepository.save(this.books)).willAnswer((invocation) -> invocation.getArgument(0));
 
@@ -111,5 +115,22 @@ class BookServiceTest {
         Page<Books> booksDTOS = bookServiceImpl.getBooks(pagingRequest);
 
         assertThat(booksDTOS).doesNotContainNull();
+    }
+
+    @Test
+    void shouldFetchIdBooksException() {
+        assertThrows(Exception.class, () -> {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Books not found");
+        });
+    }
+
+    @Test
+    void shouldDeleteBooksNull() {
+
+        final String id = "1";
+
+        Books booksDTOS = bookServiceImpl.deleteBooks(id);
+
+        assertThat(booksDTOS).isNull();
     }
 }

@@ -1,5 +1,6 @@
 package com.book.bookstore.service;
 
+import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import org.springframework.data.domain.Page;
@@ -15,11 +16,12 @@ public interface BookService {
 
     Collection<Books> getAllBooks();
 
-    Books getBooksById(String id);
+    Books getBooksById(String id) throws ApiException;
 
     Books updateBooks(BooksRequest booksRequest);
 
     Books deleteBooks(String id);
 
     Page<Books> getBooks(Pageable pageable);
+
 }

@@ -51,12 +51,8 @@ public class BookController {
                             schema = @Schema(implementation = String.class))})
     })
     @PostMapping
-    public ResponseEntity<Books> saveBooks(@RequestBody BooksRequest booksRequest) throws ApiException {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(bookService.saveBooks(booksRequest));
-        } catch (Exception e) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+    public ResponseEntity<Books> saveBooks(@RequestBody BooksRequest booksRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.saveBooks(booksRequest));
     }
 
     @Operation(summary = "Update a books")
@@ -92,7 +88,7 @@ public class BookController {
             @ApiResponse(responseCode = "404", description = "Book not found",
                     content = @Content)})
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Books> getBooksById(@PathVariable String id) {
+    public ResponseEntity<Books> getBooksById(@PathVariable String id) throws ApiException {
         return ResponseEntity.ok(bookService.getBooksById(id));
     }
 

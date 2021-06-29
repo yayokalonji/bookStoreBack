@@ -37,6 +37,8 @@
                 <sonar.organization>bookstoreback</sonar.organization>
                 <sonar.host.url>https://sonarcloud.io</sonar.host.url>
                 <sonar.jacoco.coveragePlugin>jacoco</sonar.jacoco.coveragePlugin>
+                <sonar.coverage.jacoco.xmlReportPaths>${project.baseUri}/target/site/jacoco/jacoco.xml
+                </sonar.coverage.jacoco.xmlReportPaths>
                 <sonar.coverage.exclusions>
                     **/generated/**/*,
                     **/model/**/*

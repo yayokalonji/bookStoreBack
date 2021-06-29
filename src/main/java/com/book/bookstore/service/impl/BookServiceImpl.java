@@ -1,5 +1,6 @@
 package com.book.bookstore.service.impl;
 
+import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
@@ -8,17 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
 
 @Service
+@Transactional
 public class BookServiceImpl implements BookService {
 
     @Autowired
@@ -29,7 +30,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Books saveBooks(BooksRequest booksRequest) {
         Books books = new Books(booksRequest.getAuthor(), booksRequest.getName(), booksRequest.getPrice(), booksRequest.getCategory());
-        return bookRepository.insert(books);
+        return bookRepository.save(books);
     }
 
     @Override
@@ -38,8 +39,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Books getBooksById(String id) {
-        return bookRepository.findById(id).orElse(null);
+    public Books getBooksById(String id) throws ApiException {
+        final Optional<Books> booksOptional = bookRepository.findById(id);
+        return booksOptional.orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Books not found"));
     }
 
     @Override
