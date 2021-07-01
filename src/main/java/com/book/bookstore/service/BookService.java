@@ -20,7 +20,7 @@ public interface BookService {
 
     Books updateBooks(BooksRequest booksRequest);
 
-    Books deleteBooks(String id);
+    Books deleteBooks(String id) throws ApiException;
 
     Page<Books> getBooks(Pageable pageable);
 

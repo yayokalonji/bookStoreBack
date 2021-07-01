@@ -5,6 +5,7 @@ import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
 import com.book.bookstore.service.BookService;
+import com.book.bookstore.util.Messages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,7 +42,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Books getBooksById(String id) throws ApiException {
         final Optional<Books> booksOptional = bookRepository.findById(id);
-        return booksOptional.orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Books not found"));
+        return booksOptional.orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, Messages.NO_FOUND.getMessage()));
     }
 
     @Override
@@ -51,11 +52,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Books deleteBooks(String id) {
+    public Books deleteBooks(String id) throws ApiException {
         Books books = bookRepository.findById(id).orElse(null);
-        if (books != null) {
-            bookRepository.delete(books);
+        if (books == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, Messages.NO_FOUND.getMessage());
         }
+        bookRepository.delete(books);
         return books;
     }
 

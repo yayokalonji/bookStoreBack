@@ -5,6 +5,7 @@ import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.repository.BookRepository;
 import com.book.bookstore.service.impl.BookServiceImpl;
+import com.book.bookstore.util.Messages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -97,7 +98,7 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldDeleteBooks() {
+    void shouldDeleteBooks() throws Exception {
 
         final String id = "60a41ec3b71c4bc75aab9022";
 
@@ -120,7 +121,7 @@ class BookServiceTest {
     @Test
     void shouldFetchIdBooksException() {
         assertThrows(Exception.class, () -> {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Books not found");
+            throw new ApiException(HttpStatus.BAD_REQUEST, Messages.NO_FOUND.getMessage());
         });
     }
 
@@ -128,9 +129,6 @@ class BookServiceTest {
     void shouldDeleteBooksNull() {
 
         final String id = "1";
-
-        Books booksDTOS = bookServiceImpl.deleteBooks(id);
-
-        assertThat(booksDTOS).isNull();
+        assertThrows(Exception.class, () -> bookServiceImpl.deleteBooks(id));
     }
 }

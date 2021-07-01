@@ -74,7 +74,7 @@ public class BookController {
                             schema = @Schema(implementation = Books.class))})
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Books> deleteBooks(@PathVariable String id) {
+    public ResponseEntity<Books> deleteBooks(@PathVariable String id) throws ApiException {
         return ResponseEntity.ok(bookService.deleteBooks(id));
     }
 
