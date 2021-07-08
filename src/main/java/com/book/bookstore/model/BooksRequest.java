@@ -1,5 +1,6 @@
 package com.book.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -9,6 +10,7 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BooksRequest implements Serializable {
 
     private static final long serialVersionUID = -894293290677093328L;

@@ -3,6 +3,7 @@ package com.book.bookstore.controller;
 import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.Books;
 import com.book.bookstore.model.BooksRequest;
+import com.book.bookstore.model.User;
 import com.book.bookstore.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(controllers = BookController.class)
+@WebMvcTest(controllers = {BookController.class, UserController.class})
 @ActiveProfiles("test")
 class BookControllerTest {
 
@@ -47,13 +49,24 @@ class BookControllerTest {
     private List<Books> bookList;
     private Books books;
     private BooksRequest booksRequest;
+    private String token;
+
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         this.bookList = new ArrayList<>();
         this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
         this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
         this.bookList.add(this.books);
+        User user = new User();
+        user.setPassword("password");
+        user.setUserName("username");
+        MvcResult mvcResult = mockMvc.perform(post("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isOk()).andReturn();
+
+        token = mvcResult.getResponse().getContentAsString();
     }
 
     @Test
@@ -61,7 +74,7 @@ class BookControllerTest {
 
         given(bookService.getAllBooks()).willReturn(bookList);
 
-        this.mockMvc.perform(get("/api/books"))
+        this.mockMvc.perform(get("/api/books").header("Authorization", this.token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(bookList.size())));
     }
@@ -72,7 +85,7 @@ class BookControllerTest {
         this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
         given(bookService.getBooksById(id)).willReturn(books);
 
-        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/books/{id}", id).header("Authorization", this.token)).andExpect(status().isOk());
     }
 
     @Test
@@ -80,7 +93,7 @@ class BookControllerTest {
         final String id = "1";
         given(bookService.getBooksById(id)).willReturn(null);
 
-        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/books/{id}", id).header("Authorization", this.token)).andExpect(status().isOk());
     }
 
     @Test
@@ -88,7 +101,7 @@ class BookControllerTest {
 
         this.mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(this.booksRequest)))
+                .content(objectMapper.writeValueAsString(this.booksRequest)).header("Authorization", this.token))
                 .andExpect(status().isCreated());
 
         given(bookService.saveBooks(this.booksRequest)).willReturn(this.books);
@@ -101,7 +114,7 @@ class BookControllerTest {
 
         this.mockMvc.perform(put("/api/books/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(this.books)))
+                .content(objectMapper.writeValueAsString(this.books)).header("Authorization", this.token))
                 .andExpect(status().isOk());
     }
 
@@ -110,7 +123,7 @@ class BookControllerTest {
         final String id = "60a41ec3b71c4bc75aab9022";
         given(bookService.deleteBooks(id)).willReturn(this.books);
 
-        this.mockMvc.perform(delete("/api/books/{id}", id))
+        this.mockMvc.perform(delete("/api/books/{id}", id).header("Authorization", this.token))
                 .andExpect(status().isOk());
     }
 
@@ -120,7 +133,7 @@ class BookControllerTest {
         Collection<Books> books = new ArrayList<>();
         given(bookService.getAllBooks()).willReturn(books);
 
-        this.mockMvc.perform(get("/api/books"))
+        this.mockMvc.perform(get("/api/books").header("Authorization", this.token))
                 .andExpect(status().isOk());
     }
 
@@ -132,7 +145,7 @@ class BookControllerTest {
 
         given(bookService.getBooks(Mockito.any(PageRequest.class))).willReturn(booksPage);
 
-        this.mockMvc.perform(get("/api/books/filter?page=1&size=10"))
+        this.mockMvc.perform(get("/api/books/filter?page=1&size=10").header("Authorization", this.token))
                 .andExpect(status().isOk());
     }
 
