@@ -66,7 +66,9 @@ class BookControllerTest {
                 .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk()).andReturn();
 
-        token = mvcResult.getResponse().getContentAsString();
+        this.token = mvcResult.getResponse().getContentAsString();
+
+        this.token = this.token.substring(10, (this.token.length() - 2));
     }
 
     @Test

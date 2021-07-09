@@ -14,18 +14,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
 
     @PostMapping("/user")
-    public String login(@RequestBody User user) throws ApiException {
+    public Map<String, String> login(@RequestBody User user) throws ApiException {
         if (StringUtils.isNotEmpty(user.getUserName()) && StringUtils.isNotEmpty(user.getPassword())) {
             String token = getJWTToken(user.getUserName());
             user.setToken(token);
-            return token;
+            Map<String, String> map = new HashMap<>();
+            map.put("token", token);
+            return map;
         }
         throw new ApiException(HttpStatus.BAD_REQUEST, Messages.FIELD_EMPTY.getMessage());
     }
