@@ -1,8 +1,12 @@
 package com.book.bookstore.controller;
 
+import com.book.bookstore.exception.ApiException;
 import com.book.bookstore.model.User;
+import com.book.bookstore.util.Messages;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,10 +21,13 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @PostMapping("/user")
-    public String login(@RequestBody User user) {
-        String token = getJWTToken(user.getUserName());
-        user.setToken(token);
-        return token;
+    public String login(@RequestBody User user) throws ApiException {
+        if (StringUtils.isNotEmpty(user.getUserName()) && StringUtils.isNotEmpty(user.getPassword())) {
+            String token = getJWTToken(user.getUserName());
+            user.setToken(token);
+            return token;
+        }
+        throw new ApiException(HttpStatus.BAD_REQUEST, Messages.FIELD_EMPTY.getMessage());
     }
 
     private String getJWTToken(String username) {
