@@ -34,7 +34,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
             }
             filterChain.doFilter(httpServletRequest, httpServletResponse);
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException e) {
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             throw e;

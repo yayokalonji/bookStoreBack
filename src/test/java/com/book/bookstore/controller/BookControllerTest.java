@@ -6,6 +6,7 @@ import com.book.bookstore.model.BooksRequest;
 import com.book.bookstore.model.User;
 import com.book.bookstore.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,6 +52,7 @@ class BookControllerTest {
     private Books books;
     private BooksRequest booksRequest;
     private String token;
+    private String tokenBearer;
 
 
     @BeforeEach
@@ -62,11 +65,13 @@ class BookControllerTest {
         user.setPassword("password");
         user.setUserName("username");
         MvcResult mvcResult = mockMvc.perform(post("/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isOk()).andReturn();
 
         this.token = mvcResult.getResponse().getContentAsString();
+
+        this.tokenBearer = this.token;
 
         this.token = this.token.substring(10, (this.token.length() - 2));
     }
@@ -101,12 +106,12 @@ class BookControllerTest {
     @Test
     void shouldCreateNewBook() throws Exception {
 
-        this.mockMvc.perform(post("/api/books")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(this.booksRequest)).header("Authorization", this.token))
-                .andExpect(status().isCreated());
-
         given(bookService.saveBooks(this.booksRequest)).willReturn(this.books);
+
+        this.mockMvc.perform(post("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(this.booksRequest)).header("Authorization", this.token))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -115,8 +120,8 @@ class BookControllerTest {
         given(bookService.updateBooks(booksRequest)).willReturn(this.books);
 
         this.mockMvc.perform(put("/api/books/")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(this.books)).header("Authorization", this.token))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(this.books)).header("Authorization", this.token))
                 .andExpect(status().isOk());
     }
 
@@ -162,5 +167,37 @@ class BookControllerTest {
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
-}
 
+    @Test
+    void whenDerivedExceptionThrownNotHeader_thenAssertionSucceds() throws Exception {
+
+        this.mockMvc.perform(get("/api/books").header("Authorizations", this.token))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void whenDerivedExceptionThrownNotToken_thenAssertionSucceds() throws Exception {
+
+        String tokenUpdate = "0";
+
+        this.mockMvc.perform(get("/api/books").header("Authorization", tokenUpdate))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void whenDerivedExceptionThrownSign_thenAssertionSucceds() {
+
+        String tokenUpdate = this.token.concat("s");
+
+        assertThatExceptionOfType(SignatureException.class)
+                .isThrownBy(() -> this.mockMvc.perform(get("/api/books").header("Authorization", tokenUpdate)))
+                .withMessage("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.");
+    }
+
+    @Test
+    void whenDerivedExceptionThrownTokenBearer_thenAssertionSucceds() throws Exception {
+
+        this.mockMvc.perform(get("/api/books").header("Authorization", this.tokenBearer))
+                .andExpect(status().is4xxClientError());
+    }
+}

@@ -40,12 +40,22 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldGenerateAuthTokenException() throws Exception {
+    void shouldGenerateAuthTokenUserException() throws Exception {
         User user = new User();
         user.setPassword("password");
         mockMvc.perform(post("/user")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void shouldGenerateAuthTokenPassException() throws Exception {
+        User user = new User();
+        user.setUserName("username");
+        mockMvc.perform(post("/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().is4xxClientError());
     }
 }
