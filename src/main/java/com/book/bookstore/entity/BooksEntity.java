@@ -1,4 +1,4 @@
-package com.book.bookstore.model;
+package com.book.bookstore.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 @Document(collection = "Books")
-public class Books implements Serializable {
+public class BooksEntity implements Serializable {
 
     private static final long serialVersionUID = 863059907274189363L;
 
@@ -23,7 +23,7 @@ public class Books implements Serializable {
     private double price;
     private String category;
 
-    public Books(String author, String name, double price, String category) {
+    public BooksEntity(String author, String name, double price, String category) {
         this.author = author;
         this.name = name;
         this.price = price;

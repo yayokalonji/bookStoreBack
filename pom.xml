@@ -29,9 +29,11 @@
                 <sonar.inclusions>src/main/java/**,src/main/resources/**</sonar.inclusions>
                 <sonar.exclusions>**/BookstoreApplication.java,
                     **/config/*.java,
-                    **/model/*.java,
-                    **/exception/*.java,
-                    **/controller/ApplicationControllerAdvice.java
+                    **/dtos/*.java,
+                    **/entity/*.java,
+                    **/mappers/*.java,
+                    **/exceptions/*.java,
+                    **/controllers/ApplicationControllerAdvice.java
                 </sonar.exclusions>
                 <sonar.projectKey>yayokalonji_bookStoreBack</sonar.projectKey>
                 <sonar.organization>bookstoreback</sonar.organization>
@@ -86,7 +88,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.20</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -126,21 +128,43 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.4.2.Final</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
-                    <excludes>
-                        <exclude>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                            <version>1.18.14</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.4.2.Final</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-Amapstruct.suppressGeneratorTimestamp=true</arg>
+                        <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                    </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.springdoc</groupId>
@@ -183,24 +207,28 @@
                                 <rule>
                                     <excludes>
                                         <exclude>com/book/bookstore/BookstoreApplication</exclude>
-                                        <exclude>com/book/bookstore/model/*</exclude>
-                                        <exclude>com/book/bookstore/exception/*</exclude>
-                                        <exclude>com/book/bookstore/controller/ApplicationControllerAdvice</exclude>
+                                        <exclude>com/book/bookstore/dtos/*</exclude>
+                                        <exclude>com/book/bookstore/entity/*</exclude>
+                                        <exclude>com/book/bookstore/exceptions/*</exclude>
+                                        <exclude>com/book/bookstore/mappers/*</exclude>
+                                        <exclude>com/book/bookstore/controllers/ApplicationControllerAdvice</exclude>
                                     </excludes>
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>90%</minimum>
+                                            <minimum>80%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
                             </rules>
                             <excludes>
                                 <exclude>com/book/bookstore/BookstoreApplication.class</exclude>
-                                <exclude>com/book/bookstore/model/*</exclude>
-                                <exclude>com/book/bookstore/exception/*</exclude>
-                                <exclude>com/book/bookstore/controller/ApplicationControllerAdvice.class</exclude>
+                                <exclude>com/book/bookstore/dtos/*</exclude>
+                                <exclude>com/book/bookstore/entity/*</exclude>
+                                <exclude>com/book/bookstore/exceptions/*</exclude>
+                                <exclude>com/book/bookstore/mappers/*</exclude>
+                                <exclude>com/book/bookstore/controllers/ApplicationControllerAdvice.class</exclude>
                             </excludes>
                         </configuration>
                     </execution>

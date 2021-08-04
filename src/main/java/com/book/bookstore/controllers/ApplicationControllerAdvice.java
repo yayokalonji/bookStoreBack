@@ -1,6 +1,6 @@
-package com.book.bookstore.controller;
+package com.book.bookstore.controllers;
 
-import com.book.bookstore.exception.ApiException;
+import com.book.bookstore.exceptions.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

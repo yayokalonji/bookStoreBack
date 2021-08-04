@@ -1,11 +1,10 @@
-package com.book.bookstore.service;
+package com.book.bookstore.services;
 
-import com.book.bookstore.exception.ApiException;
-import com.book.bookstore.model.Books;
-import com.book.bookstore.model.BooksRequest;
-import com.book.bookstore.repository.BookRepository;
-import com.book.bookstore.service.impl.BookServiceImpl;
-import com.book.bookstore.util.Messages;
+import com.book.bookstore.entity.BooksEntity;
+import com.book.bookstore.exceptions.ApiException;
+import com.book.bookstore.repositories.BookRepository;
+import com.book.bookstore.services.impl.BookServiceImpl;
+import com.book.bookstore.utils.Messages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,17 +37,16 @@ class BookServiceTest {
     @Autowired
     @InjectMocks
     private BookServiceImpl bookServiceImpl;
-    private List<Books> bookList;
-    private Books books, booksInsert;
-    private BooksRequest booksRequest;
+
+
+    private List<BooksEntity> bookList;
+    private BooksEntity booksEntity, booksEntityInsert;
 
     @BeforeEach
     void setUp() {
         this.bookList = new ArrayList<>();
-        this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Political");
-        this.booksInsert = new Books("Jason Brennan", "Against Democracy: New Preface", 18.95, "Political");
-        this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        this.bookList.add(books);
+        this.booksEntity = new BooksEntity("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Political");
+        this.bookList.add(booksEntity);
     }
 
     @Test
@@ -56,9 +54,9 @@ class BookServiceTest {
 
         given(bookRepository.findAll()).willReturn(bookList);
 
-        Collection<Books> booksList = bookServiceImpl.getAllBooks();
+        Collection<BooksEntity> booksEntityList = bookServiceImpl.getAllBooks();
 
-        assertEquals(booksList, bookList);
+        assertEquals(booksEntityList, bookList);
 
         verify(bookRepository, times(1)).findAll();
     }
@@ -66,21 +64,21 @@ class BookServiceTest {
     @Test
     void shouldSavedBookSuccessFully() {
 
-        given(bookRepository.save(booksInsert)).willReturn(books);
+        given(bookRepository.save(this.booksEntity)).willReturn(this.booksEntity);
 
-        bookServiceImpl.saveBooks(booksRequest);
+        bookServiceImpl.saveBooks(this.booksEntity);
 
-        verify(bookRepository, times(1)).save(booksInsert);
+        verify(bookRepository, times(1)).save(this.booksEntity);
     }
 
     @Test
     void shouldFetchIdBooks() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
-        given(bookRepository.findById(id)).willReturn(Optional.of(books));
+        given(bookRepository.findById(id)).willReturn(Optional.of(booksEntity));
 
-        final Books booksDTOS = bookServiceImpl.getBooksById(id);
+        final BooksEntity booksEntityDTOS = bookServiceImpl.getBooksById(id);
 
-        assertThat(booksDTOS).isSameAs(books);
+        assertThat(booksEntityDTOS).isSameAs(booksEntity);
 
         verify(bookRepository, times(1)).findById(id);
     }
@@ -88,13 +86,13 @@ class BookServiceTest {
     @Test
     void shouldUpdateBooks() {
 
-        given(bookRepository.save(this.books)).willAnswer((invocation) -> invocation.getArgument(0));
+        given(bookRepository.save(this.booksEntity)).willAnswer((invocation) -> invocation.getArgument(0));
 
-        final Books booksDTOS = bookServiceImpl.updateBooks(booksRequest);
+        final BooksEntity booksEntityDTOS = bookServiceImpl.updateBooks(this.booksEntity);
 
-        assertThat(booksDTOS).isEqualTo(this.books);
+        assertThat(booksEntityDTOS).isEqualTo(this.booksEntity);
 
-        verify(bookRepository, times(1)).save(booksDTOS);
+        verify(bookRepository, times(1)).save(booksEntityDTOS);
     }
 
     @Test
@@ -102,18 +100,18 @@ class BookServiceTest {
 
         final String id = "60a41ec3b71c4bc75aab9022";
 
-        given(bookRepository.findById(id)).willReturn(Optional.of(books));
+        given(bookRepository.findById(id)).willReturn(Optional.of(booksEntity));
 
-        Books booksDTOS = bookServiceImpl.deleteBooks(id);
+        BooksEntity booksEntityDTOS = bookServiceImpl.deleteBooks(id);
 
-        assertThat(booksDTOS).isSameAs(books);
+        assertThat(booksEntityDTOS).isSameAs(booksEntity);
     }
 
     @Test
     void shouldFetchFilter() {
         PageRequest pagingRequest = PageRequest.of(1, 10);
 
-        Page<Books> booksDTOS = bookServiceImpl.getBooks(pagingRequest);
+        Page<BooksEntity> booksDTOS = bookServiceImpl.getBooks(pagingRequest);
 
         assertThat(booksDTOS).doesNotContainNull();
     }

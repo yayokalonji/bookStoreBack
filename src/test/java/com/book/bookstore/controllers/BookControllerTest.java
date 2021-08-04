@@ -1,32 +1,31 @@
-package com.book.bookstore.controller;
+package com.book.bookstore.controllers;
 
-import com.book.bookstore.exception.ApiException;
-import com.book.bookstore.model.Books;
-import com.book.bookstore.model.BooksRequest;
-import com.book.bookstore.model.User;
-import com.book.bookstore.service.BookService;
+import com.book.bookstore.SpringSecurityWebAuxTestConfig;
+import com.book.bookstore.dtos.BooksDTO;
+import com.book.bookstore.entity.BooksEntity;
+import com.book.bookstore.exceptions.ApiException;
+import com.book.bookstore.mappers.MapStructMapper;
+import com.book.bookstore.services.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,8 +35,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(controllers = {BookController.class, UserController.class})
 @ActiveProfiles("test")
+@SpringBootTest(
+        classes = SpringSecurityWebAuxTestConfig.class
+)
+@AutoConfigureMockMvc
 class BookControllerTest {
 
     @Autowired
@@ -48,115 +50,113 @@ class BookControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-    private List<Books> bookList;
-    private Books books;
-    private BooksRequest booksRequest;
-    private String token;
-    private String tokenBearer;
+
+    @Autowired
+    private MapStructMapper mapStructMapper;
+
+    private List<BooksEntity> bookList;
+    private BooksEntity booksEntity;
+    private BooksDTO booksDTO;
 
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         this.bookList = new ArrayList<>();
-        this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
-        this.booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        this.bookList.add(this.books);
-        User user = new User();
-        user.setPassword("password");
-        user.setUserName("username");
-        MvcResult mvcResult = mockMvc.perform(post("/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isOk()).andReturn();
-
-        this.token = mvcResult.getResponse().getContentAsString();
-
-        this.tokenBearer = this.token;
-
-        this.token = this.token.substring(10, (this.token.length() - 2));
+        this.booksEntity = new BooksEntity("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
+        this.booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        this.bookList.add(this.booksEntity);
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void getAllBooks() throws Exception {
 
         given(bookService.getAllBooks()).willReturn(bookList);
 
-        this.mockMvc.perform(get("/api/books").header("Authorization", this.token))
+        this.mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(bookList.size())));
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldFetchOneBooksById() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
-        this.books = new Books("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
-        given(bookService.getBooksById(id)).willReturn(books);
+        this.booksEntity = new BooksEntity("60a41ec3b71c4bc75aab9022", "Jason Brennan", "Against Democracy: New Preface", 18.95, "Jason Brennan");
+        given(bookService.getBooksById(id)).willReturn(booksEntity);
 
-        this.mockMvc.perform(get("/api/books/{id}", id).header("Authorization", this.token)).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldNotFoundBooksById() throws Exception {
         final String id = "1";
         given(bookService.getBooksById(id)).willReturn(null);
 
-        this.mockMvc.perform(get("/api/books/{id}", id).header("Authorization", this.token)).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldCreateNewBook() throws Exception {
 
-        given(bookService.saveBooks(this.booksRequest)).willReturn(this.books);
+        given(bookService.saveBooks(mapStructMapper.bookDTOToBookEntity(this.booksDTO))).willReturn(this.booksEntity);
 
         this.mockMvc.perform(post("/api/books")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(this.booksRequest)).header("Authorization", this.token))
+                        .content(objectMapper.writeValueAsString(this.booksDTO)))
                 .andExpect(status().isCreated());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldUpdateBooks() throws Exception {
-        BooksRequest booksRequest = new BooksRequest("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
-        given(bookService.updateBooks(booksRequest)).willReturn(this.books);
+        BooksDTO booksDTO = new BooksDTO("60a41ec3b71c4bc75aab9022", "Against Democracy: New Preface", 18.95, "Political", "Jason Brennan");
+        given(bookService.updateBooks(mapStructMapper.bookDTOToBookEntity(booksDTO))).willReturn(this.booksEntity);
 
         this.mockMvc.perform(put("/api/books/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(this.books)).header("Authorization", this.token))
+                        .content(objectMapper.writeValueAsString(this.booksEntity)))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldDeleteBooks() throws Exception {
         final String id = "60a41ec3b71c4bc75aab9022";
-        given(bookService.deleteBooks(id)).willReturn(this.books);
+        given(bookService.deleteBooks(id)).willReturn(this.booksEntity);
 
-        this.mockMvc.perform(delete("/api/books/{id}", id).header("Authorization", this.token))
+        this.mockMvc.perform(delete("/api/books/{id}", id))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldFetchAllNotFoundBooks() throws Exception {
 
-        Collection<Books> books = new ArrayList<>();
+        List<BooksEntity> books = new ArrayList<>();
         given(bookService.getAllBooks()).willReturn(books);
 
-        this.mockMvc.perform(get("/api/books").header("Authorization", this.token))
+        this.mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void shouldFetchFilter() throws Exception {
 
         PageRequest pagingRequest = PageRequest.of(1, 10);
-        Page<Books> booksPage = new PageImpl<>(this.bookList, pagingRequest, this.bookList.size());
+        Page<BooksEntity> booksPage = new PageImpl<>(this.bookList, pagingRequest, this.bookList.size());
 
         given(bookService.getBooks(Mockito.any(PageRequest.class))).willReturn(booksPage);
 
-        this.mockMvc.perform(get("/api/books/filter?page=1&size=10").header("Authorization", this.token))
+        this.mockMvc.perform(get("/api/books/filter?page=1&size=10"))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username = "admin")
     void whenDerivedExceptionThrown_thenAssertionSucceds() {
         ApiException exception = assertThrows(ApiException.class, () -> {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Bad request");
@@ -168,23 +168,8 @@ class BookControllerTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
-    @Test
-    void whenDerivedExceptionThrownNotHeader_thenAssertionSucceds() throws Exception {
 
-        this.mockMvc.perform(get("/api/books").header("Authorizations", this.token))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    void whenDerivedExceptionThrownNotToken_thenAssertionSucceds() throws Exception {
-
-        String tokenUpdate = "0";
-
-        this.mockMvc.perform(get("/api/books").header("Authorization", tokenUpdate))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
+    /*@Test
     void whenDerivedExceptionThrownSign_thenAssertionSucceds() {
 
         String tokenUpdate = this.token.concat("s");
@@ -192,12 +177,12 @@ class BookControllerTest {
         assertThatExceptionOfType(SignatureException.class)
                 .isThrownBy(() -> this.mockMvc.perform(get("/api/books").header("Authorization", tokenUpdate)))
                 .withMessage("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.");
-    }
+    }*/
 
-    @Test
+    /*@Test
     void whenDerivedExceptionThrownTokenBearer_thenAssertionSucceds() throws Exception {
 
         this.mockMvc.perform(get("/api/books").header("Authorization", this.tokenBearer))
                 .andExpect(status().is4xxClientError());
-    }
+    }*/
 }
