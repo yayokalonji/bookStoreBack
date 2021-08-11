@@ -29,8 +29,8 @@ class UserControllerTest {
     @Test
     void shouldGenerateAuthToken() throws Exception {
         JwtRequestDTO jwtRequestDTO = new JwtRequestDTO();
-        jwtRequestDTO.setPassword("password");
-        jwtRequestDTO.setUsername("admin");
+        jwtRequestDTO.setPassword("123456");
+        jwtRequestDTO.setUsername("yayo");
         mockMvc.perform(post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(jwtRequestDTO)))

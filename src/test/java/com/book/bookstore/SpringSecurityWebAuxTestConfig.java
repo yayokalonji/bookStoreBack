@@ -16,7 +16,7 @@ public class SpringSecurityWebAuxTestConfig {
     @Bean
     @Primary
     public UserDetailsService userDetailsService() {
-        User user = new User("admin", "password", new ArrayList<>());
+        User user = new User("yayo", "123456", new ArrayList<>());
         return new InMemoryUserDetailsManager(Collections.singletonList(user));
     }
 }

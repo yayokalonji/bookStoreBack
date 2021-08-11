@@ -3,6 +3,7 @@ package com.book.bookstore.filters;
 import com.book.bookstore.services.impl.UserDetailsServiceImpl;
 import com.book.bookstore.utils.JwtUtil;
 import com.book.bookstore.utils.Messages;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import java.io.IOException;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+@Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -28,7 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
@@ -43,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
             username = jwtUtil.getUsernameFromToken(jwtToken);
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwtToken, userDetails).equals(Boolean.TRUE)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
@@ -52,6 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             } else {
+                SecurityContextHolder.clearContext();
                 throw new ServletException(Messages.TOKEN_INVALID.getMessage());
             }
         }

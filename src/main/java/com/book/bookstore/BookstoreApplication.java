@@ -44,7 +44,7 @@ public class BookstoreApplication extends SpringBootServletInitializer {
 
         @Override
         public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-            authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+            authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         }
 
         @Bean

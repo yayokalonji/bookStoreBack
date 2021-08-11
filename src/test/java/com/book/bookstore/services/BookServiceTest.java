@@ -40,7 +40,7 @@ class BookServiceTest {
 
 
     private List<BooksEntity> bookList;
-    private BooksEntity booksEntity, booksEntityInsert;
+    private BooksEntity booksEntity;
 
     @BeforeEach
     void setUp() {
