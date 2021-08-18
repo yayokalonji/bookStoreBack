@@ -91,7 +91,7 @@ class BookControllerTest {
     @Test
     @WithMockUser(username = "admin")
     void shouldNotFoundBooksById() throws Exception {
-        final String id = "1";
+        final String id = "60a41ec3b71c4bc75aab9065";
         given(bookService.getBooksById(id)).willReturn(null);
 
         this.mockMvc.perform(get("/api/books/{id}", id)).andExpect(status().isOk());

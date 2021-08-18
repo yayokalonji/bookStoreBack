@@ -126,7 +126,7 @@ class BookServiceTest {
     @Test
     void shouldDeleteBooksNull() {
 
-        final String id = "1";
+        final String id = "60a41ec3b71c4bc75aab9034";
         assertThrows(Exception.class, () -> bookServiceImpl.deleteBooks(id));
     }
 }
